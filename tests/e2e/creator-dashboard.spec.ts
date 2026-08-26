@@ -97,11 +97,7 @@ test('Patchwork Atlas landing explains recovery and exposes no protected data', 
     name: 'Repair community fractures before valuable members disappear.',
   })).toBeVisible()
   await expect(page.getByRole('button', { name: 'Continue with Telegram' }).first()).toBeVisible()
-  const demoLink = page.getByRole('link', { name: 'Watch the demo' })
-  await expect(demoLink).toBeVisible()
-  await expect(demoLink).toHaveAttribute('href', '/demo.mp4')
-  const demoResponse = await page.request.get('/demo.mp4')
-  expect(demoResponse.headers()['content-type']).toContain('video/mp4')
+  await expect(page.getByRole('link', { name: 'Watch the demo' })).toHaveCount(0)
   await page.getByRole('button', { name: 'Continue with Telegram' }).first().click()
   await expect(page.getByRole('dialog')).toBeVisible()
   await page.getByRole('button', { name: 'Close Telegram sign-in' }).click()

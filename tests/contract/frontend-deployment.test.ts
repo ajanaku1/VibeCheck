@@ -12,6 +12,7 @@ interface VercelConfig {
 describe('frontend deployment contract', () => {
   it('deploys the Vite dashboard on Vercel and proxies API requests to Render', async () => {
     const config = JSON.parse(await readFile('vercel.json', 'utf8')) as VercelConfig
+    const viteConfig = await readFile('vite.config.ts', 'utf8')
 
     expect(config).toMatchObject({
       framework: 'vite',
@@ -25,5 +26,7 @@ describe('frontend deployment contract', () => {
       },
       { source: '/:path*', destination: '/index.html' },
     ])
+    expect(viteConfig).toContain('publicDir: false')
+    expect(viteConfig).not.toContain('video/out')
   })
 })

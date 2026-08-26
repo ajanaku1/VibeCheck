@@ -26,7 +26,6 @@ export function renderLanding(options: LandingOptions): string {
           <p class="hero-summary">VibeCheck keeps relationship context attached to meaningful change, privately guides the creator, and follows one recovery case until the outcome is confirmed.</p>
           <div class="hero-actions">
             ${renderPrimaryAction(options.authenticated)}
-            <a class="button button-text" href="/demo.mp4">Watch the demo</a>
           </div>
           <p class="privacy-line"><span aria-hidden="true"></span>The browser proves what happened. Decisions and outreach stay private in Telegram.</p>
         </div>

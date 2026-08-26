@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   root: 'src/dashboard',
-  publicDir: '../../video/out',
+  publicDir: false,
   build: {
     outDir: '../../dist',
     emptyOutDir: true,
