@@ -1,10 +1,45 @@
 # VibeCheck
 
-VibeCheck is a Telegram-first community recovery agent for creators. It silently observes one configured community, uses a persistent Minds conversation to understand relationship context, privately guides the creator through outreach, and records recovery only after the creator confirms it.
+<p align="center">
+  <img src="brand/finals/logo.svg" alt="VibeCheck" width="120" />
+</p>
+
+<p align="center">
+  <a href="https://vibecheck-alpha-bay.vercel.app"><img src="https://img.shields.io/badge/live-Vercel-181514" alt="Live on Vercel" /></a>
+  <img src="https://img.shields.io/badge/tests-192%20passing-2f855a" alt="192 tests passing" />
+  <img src="https://img.shields.io/badge/TypeScript-5.7-3178c6" alt="TypeScript 5.7" />
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-f2643c" alt="MIT license" /></a>
+</p>
+
+VibeCheck is a Telegram-first community recovery agent for creators. It observes one configured community, uses a persistent Minds conversation to understand relationship context, privately guides the creator through outreach, and records recovery only after the creator confirms it.
 
 Built for Creative Minds Jam #1, Moderation & Community Assistance.
 
-## Key features
+**[Open the live frontend](https://vibecheck-alpha-bay.vercel.app)**
+
+> The public landing page remains available while the private recovery workspace requires a configured creator session and a healthy backend.
+
+## What is VibeCheck?
+
+Community fractures rarely arrive as clean moderation events. VibeCheck keeps relationship context attached to meaningful changes, separates evidence from inference, and gives the creator a private recovery workflow without publicly scoring or labelling members. Decisions and outreach stay in Telegram; the browser provides a read-only evidence record.
+
+## Screenshots
+
+### Public landing page
+
+![VibeCheck public landing page](docs/images/landing.png)
+
+### Private recovery overview
+
+![VibeCheck recovery overview](docs/images/overview.png)
+
+### Evidence chronology
+
+![VibeCheck recovery case chronology](docs/images/case.png)
+
+The private workspace screenshots use disclosed fictional demo data captured by the Playwright suite.
+
+## Features
 
 - Silent, app-owned Telegram webhook ingestion with exact group and creator allowlists.
 - Evidence-backed Minds reasoning through one stable `vibecheck-engine` conversation.
@@ -44,7 +79,7 @@ Minds is load-bearing for contextual interpretation, remembered norms, uncertain
 
 The Telegram bot is owned by this application. Do **not** connect it to a Minds Telegram agent: that design cannot guarantee silence in the group. Minds is used only through the stable Builder API engine alias.
 
-## Tech stack
+## Tech Stack
 
 - TypeScript 5.7 and Node.js 22.13+
 - Fastify 5 and Vite 6
@@ -91,7 +126,7 @@ cp .env.example .env
 | `TELEGRAM_BOT_TOKEN` | Token for the app-owned bot |
 | `TELEGRAM_BOT_USERNAME` | Bot username without `@` |
 | `TELEGRAM_COMMUNITY_CHAT_ID` | Negative numeric group/supergroup ID |
-| `TELEGRAM_WEBHOOK_SECRET` | 32–256 characters from `A-Z a-z 0-9 _ -` |
+| `TELEGRAM_WEBHOOK_SECRET` | 32 to 256 characters from `A-Z a-z 0-9 _ -` |
 | `AUTHORIZED_TELEGRAM_USER_ID` | Numeric creator user ID |
 | `AUTHORIZED_TELEGRAM_CHAT_ID` | Creator private chat ID; must equal the user ID |
 | `MINDS_BUILDER_API_KEY` | Server-side Minds Builder API key |
@@ -146,7 +181,7 @@ npm run probe:live
 - `configure:telegram` registers `${APP_BASE_URL}/api/telegram/webhook`, the secret token, and only `message` updates without dropping queued updates.
 - `probe:live` checks the engine alias, exact webhook URL, disabled group privacy, group membership, and a creator-private test delivery. It sends nothing to the group.
 
-See [the live probe guide](docs/integration-probe.md) and [the validation quickstart](specs/001-community-recovery/quickstart.md).
+See [the validation quickstart](specs/001-community-recovery/quickstart.md).
 
 ## Runtime behavior and safety
 
@@ -206,6 +241,19 @@ tests/                     Unit, contract, integration, and browser tests
 | `npm run probe:live` | Verify live integration prerequisites |
 | `npm run demo:seed -- <new-db-path>` | Seed disclosed rehearsal data without overwriting an existing database |
 | `npm run demo:rehearse` | Run the no-network rehearsal |
+
+## API Reference
+
+| Method | Route | Purpose | Access |
+|---|---|---|---|
+| `GET` | `/api/health` | Service health and dependency state | Public |
+| `POST` | `/api/telegram/webhook` | Authenticated Telegram update ingestion | Telegram secret |
+| `GET` | `/api/auth/config` | Telegram login configuration | Public |
+| `POST` | `/api/auth/telegram` | Verify Telegram login and create a session | Telegram signature |
+| `GET` | `/api/auth/session` | Resume the configured creator session | Creator session |
+| `POST` | `/api/auth/logout` | End the current creator session | Creator session |
+| `GET` | `/api/recovery-overview` | Evidence-limited case summary | Creator session |
+| `GET` | `/api/recovery-cases/:caseId` | Read-only recovery chronology | Creator session |
 
 ## Testing
 

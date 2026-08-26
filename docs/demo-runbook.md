@@ -53,16 +53,16 @@ npm run probe:live
 
 Use consenting participants or clearly fictional identities. Keep the screen label `Demo Mode` visible.
 
-### Session 1 — retained context
+### Session 1: retained context
 
 Post messages that establish both:
 
 - a community norm of challenging ideas without making disagreement personal;
-- an existing Alex–Sam pattern of repairing disagreements by pairing on a smaller next step.
+- an existing Alex-Sam pattern of repairing disagreements by pairing on a smaller next step.
 
 Wait for the live Mind baseline reasoning run to succeed. The bot must remain silent in the group.
 
-### Session 2 — one fracture and private intervention
+### Session 2: one fracture and private intervention
 
 Post exactly the staged three-message exchange from `tests/fixtures/canonical-scenario.ts`. Confirm that:
 
@@ -72,7 +72,7 @@ Post exactly the staged three-message exchange from `tests/fixtures/canonical-sc
 - `Approve` leaves the case in `needs_review`;
 - a separate `Sent` command moves it to `monitoring`.
 
-### Session 3 — recovery and confirmation
+### Session 3: recovery and confirmation
 
 Post the affected member's return first. It must not request confirmation alone. Then post the relevant constructive interaction involving both members. Confirm that one private recovery prompt appears. Send `Confirm recovery` and verify the case becomes `resolved`.
 

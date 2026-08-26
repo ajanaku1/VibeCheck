@@ -1,14 +1,17 @@
-# build-prompt scaffolding (local only)
+# Local project scaffolding
 Goal.md
 prompt.md
 plan.md
 design.md
+.Codex/
 
 # Dependencies
 node_modules/
 
 # Build output
 dist/
+.next/
+build/
 coverage/
 playwright-report/
 test-results/
