@@ -223,7 +223,9 @@ Regression coverage includes webhook authentication, exact allowlists, zero grou
 
 ## Production deployment
 
-The committed `render.yaml` defines a free Render service for the staged submission walkthrough. Its SQLite filesystem is ephemeral: cases can be lost after a restart or redeploy, so this configuration is for one uninterrupted demo session and does not satisfy the durable-storage production requirement below. A production deployment still requires:
+The dashboard deploys to Vercel from `vercel.json`. Vercel serves the Vite bundle and proxies `/api/*` to the Render origin so browser cookies remain same-origin. The current production frontend is `https://vibecheck-alpha-bay.vercel.app`.
+
+The committed `infra/render.yaml` defines the free Render API, Telegram webhook, and background worker for the staged submission walkthrough. Its SQLite filesystem is ephemeral: cases can be lost after a restart or redeploy, so this configuration is for one uninterrupted demo session and does not satisfy the durable-storage production requirement below. A production backend still requires:
 
 - one continuously running Node.js process;
 - HTTPS termination at `APP_BASE_URL`;
@@ -232,7 +234,7 @@ The committed `render.yaml` defines a free Render service for the staged submiss
 - restart policy and log collection;
 - webhook configuration after the service is publicly reachable.
 
-Build with `npm run build` and start with `npm run start`. Do not deploy as a static-only site or ephemeral function: webhook processing, SQLite, deadlines, and background work require the persistent process and volume.
+Build the dashboard with `npm run build`. Start the backend with `npm run start`; do not move webhook processing, SQLite, deadlines, or background work into a static deployment or ephemeral function.
 
 After every production URL, bot token, or webhook-secret change, rerun:
 

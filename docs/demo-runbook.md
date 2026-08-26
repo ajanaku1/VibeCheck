@@ -29,7 +29,9 @@ The seeder refuses to overwrite an existing database.
 
 ## 2. Production prerequisites
 
-Deploy `render.yaml` from the repository. It intentionally uses Render's free tier and an ephemeral SQLite path. A restart or redeploy can erase the demo database, so finish configuration and record the walkthrough in one uninterrupted service session. Populate every `sync: false` environment variable in the Render dashboard, then confirm:
+Deploy the frontend through the linked Vercel project and confirm `https://vibecheck-alpha-bay.vercel.app` renders the public landing page. Its `/api/*` routes proxy to Render.
+
+Deploy `infra/render.yaml` for the backend. It intentionally uses Render's free tier and an ephemeral SQLite path. A restart or redeploy can erase the demo database, so finish configuration and record the walkthrough in one uninterrupted service session. Populate every `sync: false` environment variable in the Render dashboard, then confirm:
 
 - `APP_BASE_URL` is the final HTTPS Render origin.
 - `TELEGRAM_COMMUNITY_CHAT_ID` is the exact negative ID of the staged group.

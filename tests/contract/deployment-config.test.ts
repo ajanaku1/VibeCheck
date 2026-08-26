@@ -23,7 +23,7 @@ describe('production deployment contract', () => {
       dependencies?: Record<string, string>
       devDependencies?: Record<string, string>
     }
-    const blueprint = parse(await readFile('render.yaml', 'utf8')) as { services: RenderService[] }
+    const blueprint = parse(await readFile('infra/render.yaml', 'utf8')) as { services: RenderService[] }
     const service = blueprint.services[0]
     if (!service) throw new Error('Render Blueprint must define one service')
     const variables = new Map(service.envVars.map((entry) => [entry.key, entry]))

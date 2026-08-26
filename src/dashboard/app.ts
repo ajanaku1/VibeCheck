@@ -49,14 +49,18 @@ root.addEventListener('change', handleFilterChange)
 void bootstrap()
 
 async function bootstrap(): Promise<void> {
-  setRoot(renderLoading('Checking private access…'), true)
-  authConfig = await getAuthConfig().catch(() => null)
+  showLanding()
+  const authConfigRequest = getAuthConfig()
+    .then((config) => { authConfig = config })
+    .catch(() => { authConfig = null })
   try {
     session = await getSession()
+    await authConfigRequest
     await restoreRoute()
   } catch (error) {
+    await authConfigRequest
     if (isStatus(error, 401)) showLanding()
-    else showUnavailable({ kind: 'overview' })
+    else showLanding('The private workspace is temporarily unavailable.')
   }
 }
 

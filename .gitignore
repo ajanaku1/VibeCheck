@@ -14,9 +14,8 @@ playwright-report/
 test-results/
 
 # Environment variables
-.env
-.env.local
-.env*.local
+.env*
+!.env.example
 
 # Runtime state and live-gate output
 data/
@@ -41,3 +40,4 @@ npm-debug.log*
 .idea/
 *.swp
 *.swo
+.vercel

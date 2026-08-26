@@ -117,6 +117,17 @@ test('Patchwork Atlas landing explains recovery and exposes no protected data', 
   await expect(page.locator('body')).not.toContainText(/health score|archetype|weekly briefing/i)
 })
 
+test('public landing remains available while the private API is offline', async ({ page }) => {
+  await page.route('**/api/**', (route) => route.abort('failed'))
+  await page.goto('/')
+
+  await expect(page.getByRole('heading', {
+    name: 'Repair community fractures before valuable members disappear.',
+  })).toBeVisible()
+  await expect(page.getByText('The private workspace is temporarily unavailable.')).toBeVisible()
+  await expect(page.locator('main')).toHaveAttribute('data-view', 'landing')
+})
+
 test('authorized creator moves through the Threadline shell and Mending Table pages', async ({ page }) => {
   await mockApi(page)
   await page.goto('/')
