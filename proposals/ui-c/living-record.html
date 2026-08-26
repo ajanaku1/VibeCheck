@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Living Record — VibeCheck</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --orange: #f2643c;
+      --ink: #181514;
+      --oat: #fff3e2;
+      --ash: #786a62;
+      --line: rgba(24, 21, 20, .2);
+      --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+      --sans: "Avenir Next", Avenir, "Trebuchet MS", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+    html { color: var(--ink); background: var(--oat); }
+    body { margin: 0; font: 17px/1.55 var(--serif); }
+    button { color: inherit; font: inherit; }
+    button:focus-visible { outline: 3px solid var(--orange); outline-offset: 4px; }
+    [hidden] { display: none !important; }
+    .mast { display: grid; grid-template-columns: 210px 1fr auto; gap: 24px; align-items: center; min-height: 88px; padding: 12px clamp(20px, 5vw, 70px); border-bottom: 1px solid var(--ink); }
+    .brand { display: flex; align-items: center; gap: 11px; font: 800 19px/1 var(--sans); letter-spacing: -.03em; }
+    .brand img { width: 42px; height: 42px; }
+    .mast-note { color: var(--ash); font-style: italic; }
+    .screen-nav { display: flex; gap: 18px; }
+    .screen-nav button { min-height: 44px; padding: 0; border: 0; border-bottom: 2px solid transparent; background: transparent; cursor: pointer; color: var(--ash); font: 700 11px/1 var(--sans); letter-spacing: .1em; text-transform: uppercase; }
+    .screen-nav button:hover, .screen-nav button[data-current] { border-color: var(--orange); color: var(--ink); }
+    .screen { min-height: calc(100vh - 88px); padding: clamp(40px, 7vw, 96px) clamp(20px, 7vw, 112px) 112px; animation: reveal 280ms ease-out; }
+    h1, h2, h3, p { margin-top: 0; }
+    .folio { display: flex; align-items: center; gap: 11px; color: var(--ash); font: 700 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+    .folio::before { content: ""; width: 34px; height: 6px; border-radius: 55% 45% 50% 50%; background: var(--orange); }
+    h1 { max-width: 980px; margin: 26px 0; font: 600 clamp(48px, 6.4vw, 88px)/.94 var(--serif); letter-spacing: -.055em; }
+    h1:focus { outline: none; }
+    .standfirst { max-width: 750px; color: var(--ash); font-size: clamp(20px, 2.1vw, 29px); line-height: 1.42; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+    .button { min-height: 50px; padding: 0 20px; border: 1px solid var(--ink); background: transparent; cursor: pointer; font: 700 13px/1 var(--sans); }
+    .button:hover { background: var(--orange); }
+    .button.primary { background: var(--ink); color: var(--oat); }
+    .button.primary:hover { border-color: var(--orange); background: var(--orange); color: var(--ink); }
+    .opening { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr); gap: clamp(42px, 8vw, 130px); align-items: start; }
+    .record-mark { position: sticky; top: 32px; padding-left: 34px; border-left: 5px solid var(--orange); }
+    .record-mark img { width: 130px; height: 130px; margin-bottom: 26px; }
+    .record-mark blockquote { margin: 0; font-size: 23px; line-height: 1.35; }
+    .record-mark cite { display: block; margin-top: 15px; color: var(--ash); font: 700 11px/1 var(--sans); letter-spacing: .09em; text-transform: uppercase; }
+    .process { position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 38px; margin-top: 98px; padding-top: 42px; border-top: 5px solid var(--orange); }
+    .process article::before { content: ""; position: absolute; top: -16px; width: 26px; height: 26px; border: 5px solid var(--oat); border-radius: 42% 58% 49% 51%; background: var(--ink); outline: 2px solid var(--orange); }
+    .process small { color: var(--ash); font: 700 10px/1 var(--mono); text-transform: uppercase; }
+    .process h2 { margin: 20px 0 9px; font-size: 31px; line-height: 1.05; font-weight: 600; }
+    .process p { color: var(--ash); }
+    .closing-note { display: grid; grid-template-columns: .55fr 1.45fr; gap: 38px; margin-top: 70px; padding: 28px 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
+    .closing-note strong { font: 800 12px/1 var(--sans); text-transform: uppercase; letter-spacing: .08em; }
+    .closing-note p { margin: 0; color: var(--ash); }
+    .denied { max-width: 1030px; margin: 2vh auto; }
+    .denied-seam { display: grid; grid-template-columns: 135px 1fr; gap: 32px; align-items: start; }
+    .denied-seam img { width: 112px; }
+    .denied h1 { font-size: clamp(50px, 7vw, 90px); }
+    .withheld { margin-top: 48px; padding: 24px 0 24px 168px; border-top: 5px solid var(--orange); border-bottom: 1px solid var(--ink); color: var(--ash); }
+    .overview-head { display: grid; grid-template-columns: 1fr auto; gap: 30px; align-items: end; padding-bottom: 30px; border-bottom: 1px solid var(--ink); }
+    .overview-head h1 { margin-bottom: 0; }
+    .account { text-align: right; color: var(--ash); font: 13px/1.6 var(--sans); }
+    .account strong { display: block; color: var(--ink); }
+    .demo { color: var(--orange); font-weight: 800; }
+    .record-index { display: grid; grid-template-columns: 220px 1fr; gap: clamp(34px, 7vw, 100px); margin-top: 44px; }
+    .index-summary { position: sticky; top: 24px; height: max-content; }
+    .index-summary h2 { font-size: 26px; line-height: 1.1; }
+    .index-summary p { color: var(--ash); }
+    .counts { display: grid; grid-template-columns: 1fr 1fr; margin-top: 28px; border-top: 1px solid var(--ink); }
+    .counts div { padding: 16px 0; border-bottom: 1px solid var(--line); }
+    .counts div:nth-child(even) { padding-left: 15px; border-left: 1px solid var(--line); }
+    .counts b { display: block; font-size: 32px; line-height: 1; }
+    .counts small { color: var(--ash); font: 700 9px/1 var(--mono); text-transform: uppercase; }
+    .case-ledger { position: relative; padding-left: 60px; }
+    .case-ledger::before { content: ""; position: absolute; left: 16px; top: 12px; bottom: 12px; width: 5px; border-radius: 4px; background: var(--orange); }
+    .case-entry { position: relative; width: 100%; padding: 0 0 36px; border: 0; background: transparent; text-align: left; cursor: pointer; }
+    .case-entry::before { content: ""; position: absolute; left: -54px; top: 4px; width: 24px; height: 24px; border: 5px solid var(--oat); border-radius: 45% 55% 52% 48%; background: var(--ink); outline: 2px solid var(--orange); }
+    .case-entry:hover h2 { color: var(--orange); }
+    .case-meta { display: flex; gap: 16px; color: var(--ash); font: 700 10px/1 var(--mono); text-transform: uppercase; }
+    .case-meta .status { color: var(--orange); }
+    .case-entry h2 { margin: 11px 0 7px; font-size: clamp(31px, 4vw, 48px); line-height: 1; font-weight: 600; }
+    .case-entry p { max-width: 680px; color: var(--ash); }
+    .case-entry span:last-child { font: 700 12px/1 var(--sans); }
+    .back { min-height: 44px; padding: 0; border: 0; background: transparent; cursor: pointer; color: var(--ash); font: 700 12px/1 var(--sans); }
+    .detail-title { display: grid; grid-template-columns: 1fr auto; gap: 32px; align-items: end; margin-top: 22px; padding-bottom: 28px; border-bottom: 5px solid var(--orange); }
+    .detail-title h1 { margin-bottom: 0; }
+    .read-only { text-align: right; color: var(--ash); font: 700 11px/1.6 var(--mono); text-transform: uppercase; }
+    .story { display: grid; grid-template-columns: minmax(240px, .62fr) minmax(500px, 1.38fr); gap: clamp(48px, 8vw, 120px); margin-top: 48px; }
+    .margin-note { position: sticky; top: 26px; height: max-content; }
+    .margin-note h2 { font-size: 30px; line-height: 1.05; }
+    .margin-note dl { margin: 28px 0 0; border-top: 1px solid var(--ink); }
+    .margin-note div { padding: 15px 0; border-bottom: 1px solid var(--line); }
+    .margin-note dt { color: var(--ash); font: 700 9px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; }
+    .margin-note dd { margin: 6px 0 0; }
+    .chronicle { position: relative; padding-left: 70px; }
+    .chronicle::before { content: ""; position: absolute; left: 19px; top: 10px; bottom: 50px; width: 6px; border-radius: 5px; background: var(--orange); }
+    .entry { position: relative; padding: 0 0 55px; }
+    .entry::before { content: ""; position: absolute; left: -62px; top: 1px; width: 28px; height: 28px; border: 6px solid var(--oat); border-radius: 40% 60% 54% 46%; background: var(--ink); outline: 2px solid var(--orange); }
+    .entry time { color: var(--ash); font: 700 10px/1 var(--mono); text-transform: uppercase; }
+    .entry h2 { margin: 10px 0 9px; font-size: clamp(30px, 3.5vw, 44px); line-height: 1.05; font-weight: 600; }
+    .entry p { max-width: 660px; color: var(--ash); }
+    .source { display: inline-block; margin-top: 5px; padding: 6px 9px; border: 1px solid var(--ink); font: 700 9px/1 var(--mono); text-transform: uppercase; }
+    .excerpt { margin-top: 17px; padding: 18px 22px; border-left: 6px solid var(--orange); background: rgba(242,100,60,.1); font-style: italic; }
+    @keyframes reveal { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
+    @media (max-width: 850px) {
+      .mast { grid-template-columns: 1fr auto; }
+      .mast-note { display: none; }
+      .opening, .story { grid-template-columns: 1fr; }
+      .record-mark, .margin-note, .index-summary { position: static; }
+      .record-index { grid-template-columns: 1fr; }
+      .counts { max-width: 380px; }
+    }
+    @media (max-width: 620px) {
+      .mast { min-height: 70px; padding-inline: 18px; }
+      .brand span { display: none; }
+      .brand img { width: 38px; height: 38px; }
+      .screen-nav { gap: 12px; }
+      .screen-nav button { width: 30px; overflow: hidden; color: transparent; font-size: 0; }
+      .screen-nav button::after { content: attr(data-short); color: var(--ash); font: 800 11px/1 var(--sans); }
+      .screen-nav button[data-current]::after { color: var(--ink); }
+      .screen { padding-inline: 18px; }
+      .process { grid-template-columns: 1fr; gap: 26px; border-top: 0; border-left: 5px solid var(--orange); padding: 0 0 0 30px; }
+      .process article::before { left: -16px; top: auto; }
+      .closing-note { grid-template-columns: 1fr; }
+      .denied-seam { grid-template-columns: 1fr; }
+      .withheld { padding-left: 0; }
+      .overview-head, .detail-title { grid-template-columns: 1fr; }
+      .account, .read-only { text-align: left; }
+      .case-ledger, .chronicle { padding-left: 52px; }
+      .case-ledger::before, .chronicle::before { left: 13px; }
+      .case-entry::before { left: -48px; }
+      .entry::before { left: -52px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="mast">
+    <div class="brand"><img src="../../brand/finals/logo-mark.svg" alt=""><span>VibeCheck</span></div>
+    <div class="mast-note">A continuing record of community repair</div>
+    <nav class="screen-nav" aria-label="Prototype screens">
+      <button data-go="landing" data-short="01" data-screen-link>Opening</button>
+      <button data-go="overview" data-short="02" data-screen-link>Index</button>
+      <button data-go="detail" data-short="03" data-screen-link>Record</button>
+      <button data-go="denied" data-short="04" data-screen-link>Denied</button>
+    </nav>
+  </header>
+
+  <main class="screen" data-screen="landing">
+    <div class="opening">
+      <section><span class="folio">Volume one · A community that remembers</span><h1 tabindex="-1">Repair begins by remembering who people were to each other.</h1><p class="standfirst">VibeCheck follows the whole story: the ordinary relationship, the moment it changed, the creator’s response, and the evidence that tells us whether connection returned.</p><div class="button-row"><button class="button primary" data-go="overview">Continue with Telegram</button><button class="button" data-go="detail">Read a recovery record</button></div></section>
+      <aside class="record-mark"><img src="../../brand/finals/logo-mark.svg" alt="Neighborhood Patch"><blockquote>“A community is not one mood. It is distinct people making and remaking common ground.”</blockquote><cite>The Neighborhood Patch principle</cite></aside>
+    </div>
+    <section class="process" aria-label="The recovery record"><article><small>Entry 01 · Context</small><h2>Remember the ordinary.</h2><p>A live Mind retains evidence-backed norms and constructive relationships across separate sessions.</p></article><article><small>Entry 02 · Intervention</small><h2>Keep the choice human.</h2><p>One meaningful change becomes a private case. The creator decides how to reach out.</p></article><article><small>Entry 03 · Outcome</small><h2>Return to the same story.</h2><p>Later evidence is appended, and only creator confirmation closes the record.</p></article></section>
+    <aside class="closing-note"><strong>The privacy boundary</strong><p>VibeCheck remains silent in the community. It never publicly labels a member, sends outreach, or turns inference into fact.</p></aside>
+  </main>
+
+  <main class="screen denied" data-screen="denied" hidden>
+    <div class="denied-seam"><img src="../../brand/finals/logo-mark.svg" alt=""><section><span class="folio">Identity verified · record sealed</span><h1 tabindex="-1">This community story is not yours to read.</h1><p class="standfirst">Your Telegram account is valid, but it is not the creator configured for this private recovery record. The protected story remains closed.</p><div class="button-row"><button class="button primary" data-go="landing">Return to the opening</button></div></section></div>
+    <p class="withheld">No community name, person, message, inference, case identifier, or history has been loaded into this state.</p>
+  </main>
+
+  <main class="screen" data-screen="overview" hidden>
+    <header class="overview-head"><div><span class="folio">Recovery index · Observation active</span><h1 tabindex="-1">Staged Creators</h1></div><div class="account"><strong>Ada · @ada</strong>Authenticated through Telegram<br><span class="demo">Demo mode · compressed timing</span></div></header>
+    <div class="record-index">
+      <aside class="index-summary"><h2>The current volume</h2><p>VibeCheck is learning quietly and keeping one continuing recovery record.</p><div class="counts"><div><b>1</b><small>Open</small></div><div><b>1</b><small>Awaiting you</small></div><div><b>0</b><small>Resolved</small></div><div><b>0</b><small>Unresolved</small></div></div></aside>
+      <section class="case-ledger" aria-label="Recovery cases"><button class="case-entry" data-go="detail"><span class="case-meta"><span class="status">Needs review</span><time>Updated 2 min ago</time></span><h2>Alex and Sam</h2><p>A normally constructive exchange became personal. The remembered relationship and the later change now live in one case.</p><span>Continue the record →</span></button></section>
+    </div>
+  </main>
+
+  <main class="screen" data-screen="detail" hidden>
+    <button class="back" data-go="overview">← Back to the recovery index</button>
+    <header class="detail-title"><div><span class="folio">Record VC-022 · Needs review</span><h1 tabindex="-1">Alex and Sam</h1></div><div class="read-only">Read-only evidence<br><span class="demo">Demo mode · compressed timing</span></div></header>
+    <div class="story">
+      <aside class="margin-note"><h2>What this record holds</h2><dl><div><dt>Observed change</dt><dd>The exchange became personal.</dd></div><div><dt>Remembered context</dt><dd>They usually repair disagreements quickly with humor.</dd></div><div><dt>Mind confidence</dt><dd>82%; intent remains uncertain.</dd></div><div><dt>Suggested outreach</dt><dd>Check in privately and acknowledge how the exchange landed.</dd></div></dl></aside>
+      <section class="chronicle" aria-label="Chronological case record">
+        <article class="entry"><time>12:00 · Community message</time><h2>The signal appeared.</h2><p>Three messages involved both members and contained two distinct escalation indicators.</p><span class="source">Observed Telegram activity</span><p class="excerpt">“This stopped being about the idea.”</p></article>
+        <article class="entry"><time>12:01 · Remembered context</time><h2>An earlier relationship returned.</h2><p>Across a separate session, Alex and Sam disagreed constructively and repaired tension with humor.</p><span class="source">Stable Mind memory</span></article>
+        <article class="entry"><time>12:03 · Mind inference</time><h2>One case opened.</h2><p>The later exchange departed from the known pattern. Confidence is 82%; intent and cause remain uncertain.</p><span class="source">Mind inference</span></article>
+        <article class="entry"><time>Waiting · Creator decision</time><h2>The record waits for a human choice.</h2><p>Approve, edit, or dismiss the private outreach in Telegram. VibeCheck will not contact either member.</p><span class="source">Creator action required</span></article>
+      </section>
+    </div>
+  </main>
+  <script src="prototype.js"></script>
+</body>
+</html>

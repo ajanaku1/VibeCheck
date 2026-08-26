@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title-a desc-a">
+  <title id="title-a">Shared Ground</title>
+  <desc id="desc-a">Three unequal leaning forms gather on one soft orange common ground.</desc>
+  <rect width="256" height="256" rx="52" fill="#FFF3E2"/>
+  <g fill="#181514" stroke="#FFF3E2" stroke-width="6">
+    <rect x="35" y="99" width="88" height="57" rx="28" transform="rotate(-9 79 127.5)"/>
+    <rect x="96" y="82" width="62" height="88" rx="30" transform="rotate(5 127 126)"/>
+    <rect x="151" y="59" width="64" height="116" rx="31" transform="rotate(15 183 117)"/>
+  </g>
+  <path d="M43 151c26-8 51-5 76 2 28 8 58 8 94 0l3 28c-34 12-67 12-99 3-24-7-48-8-73-1l-1-32Z" fill="#F2643C"/>
+</svg>

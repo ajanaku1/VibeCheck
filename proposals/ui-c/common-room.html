@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Common Room — VibeCheck</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --orange: #f2643c;
+      --ink: #181514;
+      --oat: #fff3e2;
+      --ash: #786a62;
+      --line: rgba(24, 21, 20, .18);
+      --display: "Avenir Next Condensed", "Franklin Gothic Condensed", sans-serif;
+      --body: "Avenir Next", Avenir, "Trebuchet MS", sans-serif;
+    }
+    html { background: var(--oat); color: var(--ink); }
+    body { margin: 0; font: 15px/1.45 var(--body); }
+    button { font: inherit; color: inherit; }
+    button:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+    [hidden] { display: none !important; }
+    .app { display: grid; grid-template-columns: 232px 1fr; min-height: 100vh; }
+    .rail { position: sticky; top: 0; display: flex; flex-direction: column; height: 100vh; padding: 24px 18px; background: var(--ink); color: var(--oat); }
+    .brand { display: flex; align-items: center; gap: 11px; padding: 0 8px 24px; font-size: 20px; font-weight: 800; letter-spacing: -.035em; }
+    .brand img { width: 42px; height: 42px; }
+    .rail-label { margin: 22px 10px 9px; color: rgba(255,243,226,.48); font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+    .rail nav { display: grid; gap: 5px; }
+    .rail button { display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 13px; border: 0; border-radius: 13px 18px 13px 17px; background: transparent; color: rgba(255,243,226,.68); text-align: left; cursor: pointer; }
+    .rail button::before { content: ""; width: 11px; height: 11px; border: 2px solid currentColor; border-radius: 42% 58% 51% 49%; }
+    .rail button:hover, .rail button[data-current] { background: var(--orange); color: var(--ink); }
+    .rail-note { margin-top: auto; padding: 17px; border: 1px solid rgba(255,243,226,.16); border-radius: 17px 23px 16px 21px; color: rgba(255,243,226,.64); font-size: 12px; }
+    .rail-note b { display: block; margin-bottom: 4px; color: var(--oat); }
+    .content { min-width: 0; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; min-height: 76px; padding: 12px clamp(22px, 4vw, 58px); border-bottom: 1px solid var(--line); }
+    .context { color: var(--ash); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .identity { display: flex; align-items: center; gap: 12px; color: var(--ash); font-size: 13px; }
+    .identity i { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 44% 56% 50% 50%; background: var(--orange); color: var(--ink); font-style: normal; font-weight: 900; }
+    .screen { min-height: calc(100vh - 76px); padding: clamp(30px, 5vw, 68px) clamp(22px, 5vw, 72px) 108px; animation: settle 220ms ease-out; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { max-width: 1020px; margin-bottom: 22px; font: 800 clamp(50px, 7vw, 96px)/.9 var(--display); letter-spacing: -.055em; text-transform: uppercase; }
+    h1:focus { outline: none; }
+    .lede { max-width: 660px; color: var(--ash); font-size: clamp(18px, 1.8vw, 24px); }
+    .button-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 28px; }
+    .button { min-height: 48px; padding: 0 18px; border: 2px solid var(--ink); border-radius: 12px 18px 13px 17px; background: transparent; cursor: pointer; font-weight: 800; }
+    .button:hover { transform: translateY(-2px); }
+    .button.primary { background: var(--ink); color: var(--oat); }
+    .button.primary:hover { background: var(--orange); border-color: var(--orange); color: var(--ink); }
+    .landing-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, .78fr); gap: clamp(36px, 6vw, 90px); align-items: start; }
+    .tag { display: inline-flex; gap: 8px; align-items: center; margin-bottom: 20px; color: var(--orange); font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; }
+    .tag::before { content: ""; width: 24px; height: 8px; border-radius: 50%; background: var(--orange); }
+    .recovery-room { position: relative; min-height: 520px; padding: 28px; overflow: hidden; border-radius: 30px 42px 28px 38px; background: var(--orange); }
+    .recovery-room::before, .recovery-room::after { content: ""; position: absolute; background: var(--ink); border: 7px solid var(--oat); }
+    .recovery-room::before { width: 62%; height: 42%; right: -7%; top: 17%; border-radius: 31px 48px 28px 43px; transform: rotate(-3deg); }
+    .recovery-room::after { width: 72%; height: 37%; left: -9%; bottom: 3%; border-radius: 45px 31px 42px 27px; transform: rotate(2deg); }
+    .room-copy { position: relative; z-index: 2; display: flex; flex-direction: column; justify-content: space-between; min-height: 464px; }
+    .room-copy img { width: 74px; height: 74px; }
+    .room-copy strong { align-self: end; max-width: 340px; padding: 24px; border: 7px solid var(--oat); border-radius: 29px 41px 27px 37px; background: var(--ink); color: var(--oat); font: 800 32px/1 var(--display); letter-spacing: -.03em; text-transform: uppercase; }
+    .room-copy small { max-width: 260px; color: rgba(255,243,226,.7); font-weight: 700; }
+    .triptych { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 64px; }
+    .triptych article { min-height: 190px; padding: 23px; border: 1px solid var(--line); border-radius: 18px 25px 17px 23px; }
+    .triptych b { display: grid; place-items: center; width: 36px; height: 30px; margin-bottom: 34px; border-radius: 40% 60% 48% 52%; background: var(--orange); font-size: 12px; }
+    .triptych h2 { margin-bottom: 8px; font: 800 24px/1 var(--display); letter-spacing: -.02em; text-transform: uppercase; }
+    .triptych p { color: var(--ash); }
+    .trust-line { margin-top: 18px; padding: 18px 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); color: var(--ash); }
+    .trust-line strong { color: var(--ink); }
+    .denied-grid { display: grid; grid-template-columns: 220px minmax(0, 690px); gap: clamp(28px, 6vw, 82px); align-items: start; max-width: 980px; margin-top: 5vh; }
+    .denied-patch { min-height: 210px; display: grid; place-items: center; border-radius: 32px 49px 29px 43px; background: var(--orange); }
+    .denied-patch img { width: 120px; }
+    .denied-grid h1 { font-size: clamp(48px, 6vw, 80px); }
+    .zero-data { margin-top: 34px; padding: 18px; border: 1px solid var(--line); border-radius: 14px; color: var(--ash); font-size: 13px; }
+    .overview-title { display: flex; justify-content: space-between; gap: 24px; align-items: end; }
+    .overview-title h1 { margin: 0; }
+    .demo { color: var(--orange); font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: .07em; }
+    .status-grid { display: grid; grid-template-columns: 1.35fr repeat(3, .65fr); gap: 12px; margin-top: 34px; }
+    .status-grid > div { min-height: 144px; padding: 21px; border: 1px solid var(--line); border-radius: 19px 27px 18px 25px; }
+    .status-grid .active-room { background: var(--orange); border-color: var(--orange); }
+    .status-grid small { display: block; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+    .status-grid strong { display: block; margin-top: 30px; font: 800 42px/1 var(--display); text-transform: uppercase; }
+    .active-room strong { max-width: 420px; font-size: 30px; }
+    .case-heading { display: flex; align-items: center; justify-content: space-between; margin: 54px 0 16px; }
+    .case-heading h2 { margin: 0; font: 800 27px/1 var(--display); text-transform: uppercase; }
+    .case-row { display: grid; grid-template-columns: 8px 110px 1fr 150px 50px; gap: 20px; align-items: center; width: 100%; min-height: 100px; padding: 0 18px 0 0; border: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: transparent; text-align: left; cursor: pointer; }
+    .case-row::before { content: ""; width: 8px; align-self: stretch; background: var(--orange); }
+    .case-row:hover { background: rgba(242,100,60,.08); }
+    .case-row .status { color: var(--orange); font-size: 11px; font-weight: 900; text-transform: uppercase; }
+    .case-row strong { display: block; font: 800 26px/1 var(--display); text-transform: uppercase; }
+    .case-row p { margin: 5px 0 0; color: var(--ash); }
+    .case-row time { color: var(--ash); font-size: 12px; }
+    .go { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px 17px 12px 16px; background: var(--ink); color: var(--oat); }
+    .back { min-height: 44px; padding: 0; border: 0; background: transparent; color: var(--ash); cursor: pointer; font-weight: 800; }
+    .detail-head { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 30px; margin-top: 22px; padding-bottom: 24px; border-bottom: 4px solid var(--orange); }
+    .detail-head h1 { margin: 0; font-size: clamp(52px, 7vw, 94px); }
+    .detail-meta { text-align: right; color: var(--ash); }
+    .detail-grid { display: grid; grid-template-columns: minmax(380px, 1.15fr) minmax(260px, .85fr); gap: clamp(34px, 6vw, 84px); margin-top: 38px; }
+    .timeline { display: grid; }
+    .event { display: grid; grid-template-columns: 86px 32px 1fr; gap: 16px; min-height: 156px; }
+    .event time { color: var(--ash); font-size: 11px; font-weight: 700; }
+    .event-mark { position: relative; width: 22px; height: 22px; border: 5px solid var(--oat); border-radius: 41% 59% 48% 52%; background: var(--ink); outline: 3px solid var(--orange); }
+    .event-mark::after { content: ""; position: absolute; top: 23px; left: 6px; width: 4px; height: 132px; background: var(--orange); }
+    .event:last-child .event-mark::after { display: none; }
+    .event h2 { margin-bottom: 7px; font: 800 26px/1 var(--display); text-transform: uppercase; }
+    .event p { color: var(--ash); }
+    .quote { padding: 13px 15px; border-left: 4px solid var(--orange); background: rgba(242,100,60,.09); color: var(--ink); }
+    .memory-board { height: max-content; padding: 25px; border-radius: 28px 39px 27px 35px; background: var(--orange); }
+    .memory-board h2 { font: 800 29px/1 var(--display); text-transform: uppercase; }
+    .memory-board dl { margin-bottom: 0; }
+    .memory-board div { padding: 15px 0; border-top: 1px solid rgba(24,21,20,.28); }
+    .memory-board dt { color: rgba(24,21,20,.6); font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+    .memory-board dd { margin: 5px 0 0; font-weight: 700; }
+    @keyframes settle { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: none; } }
+    @media (max-width: 900px) {
+      .app { grid-template-columns: 78px 1fr; }
+      .brand { justify-content: center; padding-inline: 0; font-size: 0; }
+      .rail button { justify-content: center; padding: 0; font-size: 0; }
+      .rail-label, .rail-note { display: none; }
+      .landing-grid, .detail-grid { grid-template-columns: 1fr; }
+      .status-grid { grid-template-columns: repeat(3, 1fr); }
+      .active-room { grid-column: 1 / -1; }
+      .triptych { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .app { display: block; }
+      .rail { position: static; flex-direction: row; align-items: center; height: 70px; padding: 10px 14px; }
+      .brand { padding: 0; }
+      .brand img { width: 38px; height: 38px; }
+      .rail nav { display: flex; margin-left: auto; }
+      .rail button { width: 42px; min-height: 42px; }
+      .topbar { padding-inline: 18px; }
+      .identity span { display: none; }
+      .screen { padding-inline: 18px; }
+      .status-grid { grid-template-columns: 1fr 1fr; }
+      .active-room { grid-column: 1 / -1; }
+      .case-row { grid-template-columns: 8px 1fr 44px; gap: 14px; }
+      .case-row .status, .case-row time { grid-column: 2; }
+      .case-row .go { grid-column: 3; grid-row: 1 / 4; }
+      .denied-grid { grid-template-columns: 1fr; }
+      .denied-patch { min-height: 150px; }
+      .detail-head { grid-template-columns: 1fr; }
+      .detail-meta { text-align: left; }
+      .event { grid-template-columns: 64px 26px 1fr; gap: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="rail">
+      <div class="brand"><img src="../../brand/finals/logo-mark.svg" alt="">VibeCheck</div>
+      <span class="rail-label">Explore</span>
+      <nav aria-label="Prototype screens">
+        <button data-go="landing" data-screen-link>Welcome</button>
+        <button data-go="overview" data-screen-link>Overview</button>
+        <button data-go="detail" data-screen-link>Case detail</button>
+        <button data-go="denied" data-screen-link>Access denied</button>
+      </nav>
+      <aside class="rail-note"><b>Private by design.</b>VibeCheck advises the creator. It never speaks inside the community.</aside>
+    </aside>
+    <div class="content">
+      <header class="topbar"><span class="context">Community recovery · read only</span><div class="identity"><span>Ada · @ada</span><i>A</i></div></header>
+
+      <main class="screen" data-screen="landing">
+        <div class="landing-grid">
+          <section><span class="tag">Your community’s common room</span><h1 tabindex="-1">Give a hard moment somewhere to land.</h1><p class="lede">VibeCheck remembers how people normally relate, helps you respond privately when that changes, and keeps one recovery case open until you confirm the outcome.</p><div class="button-row"><button class="button primary" data-go="overview">Continue with Telegram</button><button class="button" data-go="detail">Open a recovery case</button></div></section>
+          <aside class="recovery-room" aria-label="Neighborhood Patch recovery motif"><div class="room-copy"><img src="../../brand/finals/logo-mark.svg" alt="Neighborhood Patch"><strong>Distinct people. One shared place. A way back.</strong><small>Observed evidence and human decisions never blur together.</small></div></aside>
+        </div>
+        <section class="triptych" aria-label="Recovery process"><article><b>01</b><h2>Remember</h2><p>Learn constructive relationships and community norms across sessions.</p></article><article><b>02</b><h2>Make room</h2><p>Bring one meaningful change to the creator privately, with uncertainty intact.</p></article><article><b>03</b><h2>Stay with it</h2><p>Follow later evidence and let only the creator confirm recovery.</p></article></section>
+        <p class="trust-line"><strong>No public labels. No direct messages to members.</strong> The creator remains the person who reaches out.</p>
+      </main>
+
+      <main class="screen" data-screen="denied" hidden>
+        <div class="denied-grid">
+          <div class="denied-patch"><img src="../../brand/finals/logo-mark.svg" alt=""></div>
+          <section><span class="tag">Identity verified · room closed</span><h1 tabindex="-1">You’re at the wrong community door.</h1><p class="lede">This Telegram account is valid, but it is not the creator connected to this private recovery space. Nothing from that community has been opened.</p><div class="button-row"><button class="button primary" data-go="landing">Return to welcome</button></div><p class="zero-data">Protected fields withheld: community name, members, excerpts, case identifiers, and history.</p></section>
+        </div>
+      </main>
+
+      <main class="screen" data-screen="overview" hidden>
+        <header class="overview-title"><div><span class="tag">Recovery overview</span><h1 tabindex="-1">Staged Creators</h1></div><span class="demo">Demo mode · compressed timing</span></header>
+        <section class="status-grid" aria-label="Community recovery status"><div class="active-room"><small>Observation active</small><strong>Learning the room, quietly.</strong></div><div><small>Open</small><strong>1</strong></div><div><small>Awaiting you</small><strong>1</strong></div><div><small>Resolved</small><strong>0</strong></div></section>
+        <div class="case-heading"><h2>Continuing cases</h2><span class="context">Newest evidence first</span></div>
+        <button class="case-row" data-go="detail"><span></span><span class="status">Needs review</span><span><strong>Alex + Sam</strong><p>A constructive exchange became personal; Alex has been quiet since.</p></span><time>2 min ago</time><span class="go" aria-hidden="true">→</span></button>
+      </main>
+
+      <main class="screen" data-screen="detail" hidden>
+        <button class="back" data-go="overview">← Recovery overview</button>
+        <header class="detail-head"><div><span class="tag">VC-022 · Needs review</span><h1 tabindex="-1">Alex + Sam</h1></div><div class="detail-meta"><b>Read-only case</b><br><span class="demo">Demo mode · compressed timing</span></div></header>
+        <div class="detail-grid">
+          <section class="timeline" aria-label="Recovery case timeline">
+            <article class="event"><time>12:00<br>Community</time><i class="event-mark" aria-hidden="true"></i><div><h2>Signal observed</h2><p>Three messages involved both members and contained two distinct escalation indicators.</p><p class="quote">“This stopped being about the idea.”</p></div></article>
+            <article class="event"><time>12:01<br>Memory</time><i class="event-mark" aria-hidden="true"></i><div><h2>Context returned</h2><p>In an earlier session, Alex and Sam disagreed constructively and repaired tension with humor.</p></div></article>
+            <article class="event"><time>12:03<br>Mind</time><i class="event-mark" aria-hidden="true"></i><div><h2>Case opened</h2><p>The change crossed the evidence threshold. Confidence is 82%; intent remains uncertain.</p></div></article>
+            <article class="event"><time>Waiting<br>Creator</time><i class="event-mark" aria-hidden="true"></i><div><h2>Your decision</h2><p>Approve, edit, or dismiss the private outreach in Telegram.</p></div></article>
+          </section>
+          <aside class="memory-board"><h2>What the room holds</h2><dl><div><dt>Observed change</dt><dd>The exchange became personal.</dd></div><div><dt>Remembered relationship</dt><dd>They usually repair disagreement quickly.</dd></div><div><dt>Uncertainty</dt><dd>Withdrawal may have other causes.</dd></div><div><dt>Suggested outreach</dt><dd>Check in privately and acknowledge how the exchange landed.</dd></div></dl></aside>
+        </div>
+      </main>
+    </div>
+  </div>
+  <script src="prototype.js"></script>
+</body>
+</html>

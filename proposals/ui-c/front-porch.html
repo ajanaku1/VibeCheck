@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Front Porch — VibeCheck</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --orange: #f2643c;
+      --ink: #181514;
+      --oat: #fff3e2;
+      --ash: #786a62;
+      --line: rgba(24, 21, 20, .18);
+      --display: "Cooper Black", "Iowan Old Style", Georgia, serif;
+      --body: "Avenir Next", Avenir, "Trebuchet MS", sans-serif;
+    }
+    html { background: var(--oat); color: var(--ink); }
+    body { margin: 0; font: 16px/1.5 var(--body); }
+    button, a { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, a:focus-visible { outline: 3px solid var(--orange); outline-offset: 4px; }
+    [hidden] { display: none !important; }
+    .shell { min-height: 100vh; overflow: hidden; }
+    .masthead { display: flex; align-items: center; justify-content: space-between; min-height: 82px; padding: 12px clamp(20px, 5vw, 72px); border-bottom: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: -.04em; font-size: 21px; }
+    .brand img { width: 38px; height: 38px; transform: rotate(-3deg); }
+    .screen-nav { display: flex; gap: 2px; align-items: center; }
+    .screen-nav button { min-height: 44px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; cursor: pointer; color: var(--ash); font-size: 13px; }
+    .screen-nav button:hover, .screen-nav button[data-current] { background: var(--ink); color: var(--oat); }
+    .screen { min-height: calc(100vh - 82px); padding: clamp(38px, 6vw, 88px) clamp(20px, 7vw, 108px) 110px; animation: arrive 260ms cubic-bezier(.2,.8,.2,1); }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; color: var(--ash); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; }
+    .eyebrow::before { content: ""; width: 18px; height: 10px; border-radius: 48% 52% 45% 55%; background: var(--orange); transform: rotate(-7deg); }
+    h1 { margin: 20px 0; max-width: 920px; font-family: var(--display); font-size: clamp(50px, 8.2vw, 112px); line-height: .93; letter-spacing: -.055em; font-weight: 700; }
+    h1:focus { outline: none; }
+    h2, h3, p { margin-top: 0; }
+    .lede { max-width: 660px; color: var(--ash); font-size: clamp(19px, 2vw, 27px); line-height: 1.4; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+    .button { min-height: 50px; padding: 0 20px; border: 1px solid var(--ink); border-radius: 999px; background: transparent; cursor: pointer; font-weight: 700; transition: transform 160ms ease-out, background 160ms ease-out, color 160ms ease-out; }
+    .button:hover { transform: translateY(-2px); }
+    .button.primary { background: var(--ink); color: var(--oat); }
+    .button.primary:hover { background: var(--orange); border-color: var(--orange); color: var(--ink); }
+    .porch { display: grid; grid-template-columns: minmax(0, 1.08fr) minmax(330px, .92fr); gap: clamp(36px, 7vw, 100px); align-items: center; }
+    .gathering { position: relative; min-height: 540px; padding: 54px 44px; border-radius: 46% 54% 45% 55% / 13% 17% 12% 16%; background: var(--orange); transform: rotate(1.5deg); }
+    .gathering::after { content: ""; position: absolute; inset: 22px 24px; border: 2px solid var(--oat); border-radius: 45% 55% 49% 51% / 14% 11% 16% 13%; pointer-events: none; }
+    .patch-mark { position: relative; z-index: 1; width: 90px; height: 90px; margin-bottom: 42px; transform: rotate(-4deg); }
+    .welcome-note { position: relative; z-index: 1; max-width: 480px; }
+    .welcome-note strong { display: block; max-width: 420px; font: 700 clamp(33px, 4vw, 54px)/1.02 var(--display); letter-spacing: -.04em; }
+    .welcome-note p { margin: 18px 0 0; max-width: 380px; color: rgba(24,21,20,.72); font-weight: 600; }
+    .porch-steps { position: absolute; z-index: 1; right: 36px; bottom: 28px; display: flex; gap: 8px; }
+    .porch-steps span { display: grid; place-items: center; width: 54px; height: 54px; border: 2px solid var(--oat); border-radius: 38% 62% 51% 49%; background: var(--ink); color: var(--oat); font-size: 12px; font-weight: 800; }
+    .promise-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin-top: 88px; background: var(--line); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .promise { min-height: 220px; padding: 30px; background: var(--oat); }
+    .promise b { display: inline-grid; place-items: center; width: 32px; height: 32px; margin-bottom: 40px; border-radius: 47% 53% 55% 45%; background: var(--orange); font-size: 12px; }
+    .promise h2 { margin-bottom: 8px; font: 700 27px/1.1 var(--display); letter-spacing: -.03em; }
+    .promise p { color: var(--ash); }
+    .privacy-note { display: flex; justify-content: space-between; gap: 32px; margin-top: 46px; padding-top: 20px; border-top: 2px solid var(--ink); color: var(--ash); }
+    .privacy-note strong { max-width: 400px; color: var(--ink); }
+    .denied-wrap { max-width: 920px; margin: 3vh auto; text-align: center; }
+    .denied-mark { display: grid; place-items: center; width: 116px; height: 108px; margin: 0 auto 34px; border-radius: 47% 53% 45% 55%; background: var(--orange); }
+    .denied-mark img { width: 72px; }
+    .denied-wrap h1 { margin-inline: auto; font-size: clamp(48px, 7vw, 88px); }
+    .denied-wrap .lede { margin-inline: auto; }
+    .denied-wrap .actions { justify-content: center; }
+    .privacy-zero { margin-top: 42px; padding: 18px 24px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); color: var(--ash); font-size: 14px; }
+    .overview-head { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; }
+    .overview-head h1, .case-head h1 { margin-bottom: 0; font-size: clamp(52px, 7vw, 92px); }
+    .identity { text-align: right; color: var(--ash); font-size: 14px; }
+    .identity strong { display: block; color: var(--ink); }
+    .demo { display: inline-block; margin-top: 8px; color: var(--orange); font-weight: 800; }
+    .community-field { display: grid; grid-template-columns: 1.1fr repeat(3, .55fr); gap: 1px; margin: 48px 0 54px; overflow: hidden; border-radius: 30px; background: var(--oat); border: 2px solid var(--orange); }
+    .field-main, .metric { min-height: 150px; padding: 26px; background: var(--orange); }
+    .field-main { display: flex; flex-direction: column; justify-content: space-between; }
+    .field-main small, .metric small { font-weight: 800; text-transform: uppercase; letter-spacing: .09em; }
+    .field-main strong { font: 700 31px/1.1 var(--display); }
+    .metric { background: var(--ink); color: var(--oat); }
+    .metric b { display: block; margin-top: 26px; font: 700 48px/1 var(--display); }
+    .case-list { display: grid; gap: 14px; }
+    .case-button { display: grid; grid-template-columns: 120px 1fr auto; gap: 26px; align-items: center; width: 100%; min-height: 104px; padding: 20px 24px; border: 1px solid var(--line); border-radius: 25px 36px 25px 34px; background: transparent; text-align: left; cursor: pointer; transition: border-color 160ms ease-out, transform 160ms ease-out; }
+    .case-button:hover { transform: translateX(4px); border-color: var(--orange); }
+    .case-button strong { font: 700 26px/1.1 var(--display); }
+    .case-button p { margin: 5px 0 0; color: var(--ash); }
+    .status { color: var(--orange); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+    .arrow { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: var(--ink); color: var(--oat); }
+    .back { min-height: 44px; padding: 0; border: 0; background: transparent; cursor: pointer; color: var(--ash); font-weight: 700; }
+    .case-head { display: flex; justify-content: space-between; gap: 28px; align-items: end; margin-top: 24px; padding-bottom: 30px; border-bottom: 2px solid var(--orange); }
+    .case-grid { display: grid; grid-template-columns: minmax(250px, .72fr) minmax(480px, 1.28fr); gap: clamp(42px, 7vw, 100px); margin-top: 42px; }
+    .case-summary { height: max-content; padding: 28px; border-radius: 36px 28px 34px 24px; background: var(--orange); }
+    .case-summary h2 { font: 700 30px/1.1 var(--display); }
+    .case-summary dl { margin: 30px 0 0; }
+    .case-summary div { padding: 16px 0; border-top: 1px solid rgba(24,21,20,.3); }
+    .case-summary dt { color: rgba(24,21,20,.65); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+    .case-summary dd { margin: 5px 0 0; font-weight: 700; }
+    .timeline { position: relative; }
+    .timeline::before { content: ""; position: absolute; left: 25px; top: 18px; bottom: 45px; width: 4px; background: var(--orange); border-radius: 4px; }
+    .event { position: relative; padding: 0 0 42px 76px; }
+    .event::before { content: ""; position: absolute; left: 12px; top: 0; width: 28px; height: 28px; border: 6px solid var(--oat); border-radius: 43% 57% 52% 48%; background: var(--ink); }
+    .event time { color: var(--ash); font-size: 12px; font-weight: 700; }
+    .event h2 { margin: 7px 0 8px; font: 700 29px/1.12 var(--display); }
+    .event p { max-width: 620px; color: var(--ash); }
+    .evidence { margin-top: 14px; padding: 18px 20px; border-left: 5px solid var(--orange); background: rgba(242,100,60,.1); font-weight: 600; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    @media (max-width: 820px) {
+      .screen-nav { display: none; }
+      .porch, .case-grid { grid-template-columns: 1fr; }
+      .gathering { min-height: 430px; }
+      .promise-strip { grid-template-columns: 1fr; }
+      .community-field { grid-template-columns: 1fr 1fr; }
+      .field-main { grid-column: 1 / -1; }
+      .overview-head, .case-head { grid-template-columns: 1fr; display: grid; }
+      .identity { text-align: left; }
+      .case-button { grid-template-columns: 1fr auto; }
+      .case-button .status { grid-column: 1 / -1; }
+    }
+    @media (max-width: 520px) {
+      .screen { padding-inline: 18px; }
+      .masthead { min-height: 70px; padding-inline: 18px; }
+      .gathering { min-height: 390px; padding: 42px 30px; }
+      .community-field { grid-template-columns: 1fr; }
+      .field-main { grid-column: auto; }
+      .privacy-note { flex-direction: column; }
+      .case-summary { border-radius: 24px; }
+      .event { padding-left: 62px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="masthead">
+      <div class="brand"><img src="../../brand/finals/logo-mark.svg" alt="">VibeCheck</div>
+      <nav class="screen-nav" aria-label="Prototype screens">
+        <button data-go="landing" data-screen-link>Welcome</button>
+        <button data-go="overview" data-screen-link>Recovery space</button>
+        <button data-go="detail" data-screen-link>Case story</button>
+        <button data-go="denied" data-screen-link>Denied</button>
+      </nav>
+    </header>
+
+    <main class="screen" data-screen="landing">
+      <div class="porch">
+        <section>
+          <span class="eyebrow">A warmer way back to each other</span>
+          <h1 tabindex="-1">Keep the people who make it feel like home.</h1>
+          <p class="lede">VibeCheck helps creators notice when a relationship changes, choose a humane response, and stay with the same recovery story until the community finds its footing again.</p>
+          <div class="actions">
+            <button class="button primary" data-go="overview">Continue with Telegram</button>
+            <button class="button" data-go="detail">See one recovery story</button>
+          </div>
+        </section>
+        <aside class="gathering" aria-label="A three-stage community recovery story">
+          <img class="patch-mark" src="../../brand/finals/logo-mark.svg" alt="Neighborhood Patch">
+          <div class="welcome-note"><strong>A community isn’t a score. It’s what people build between them.</strong><p>Remember the ordinary. Notice the change. Make room for repair.</p></div>
+          <div class="porch-steps" aria-hidden="true"><span>01</span><span>02</span><span>03</span></div>
+        </aside>
+      </div>
+      <section class="promise-strip" aria-label="How VibeCheck helps">
+        <article class="promise"><b>1</b><h2>Learn the shared rhythm.</h2><p>A live Mind remembers evidence-backed norms and relationships across separate sessions.</p></article>
+        <article class="promise"><b>2</b><h2>Guide a human response.</h2><p>A meaningful change becomes one private case, with uncertainty kept visible.</p></article>
+        <article class="promise"><b>3</b><h2>Stay for the outcome.</h2><p>Later evidence returns to the same story. Only the creator confirms recovery.</p></article>
+      </section>
+      <aside class="privacy-note"><strong>VibeCheck stays silent in your community and never contacts an affected member.</strong><span>Observed evidence, remembered context, Mind inference, and creator decisions remain visibly separate.</span></aside>
+    </main>
+
+    <main class="screen" data-screen="denied" hidden>
+      <section class="denied-wrap">
+        <div class="denied-mark"><img src="../../brand/finals/logo-mark.svg" alt=""></div>
+        <span class="eyebrow">Telegram identity verified</span>
+        <h1 tabindex="-1">This porch belongs to another community.</h1>
+        <p class="lede">You signed in successfully, but this private recovery space is connected to a different creator. We have not loaded its name, people, messages, or cases.</p>
+        <div class="actions"><button class="button primary" data-go="landing">Return to the welcome page</button></div>
+        <p class="privacy-zero">Zero protected community data was revealed in this view.</p>
+      </section>
+    </main>
+
+    <main class="screen" data-screen="overview" hidden>
+      <header class="overview-head">
+        <div><span class="eyebrow">Recovery space</span><h1 tabindex="-1">Staged Creators</h1></div>
+        <div class="identity"><strong>Ada · @ada</strong>Connected through Telegram<span class="demo">Demo mode · compressed timing</span></div>
+      </header>
+      <section class="community-field" aria-label="Community recovery summary">
+        <div class="field-main"><small>Community presence</small><strong>Listening quietly for meaningful change.</strong><span>Observation active · last evidence 2 min ago</span></div>
+        <div class="metric"><small>Open</small><b>1</b></div>
+        <div class="metric"><small>Awaiting you</small><b>1</b></div>
+        <div class="metric"><small>Resolved</small><b>0</b></div>
+      </section>
+      <span class="eyebrow">One continuing story</span>
+      <section class="case-list" aria-label="Recovery cases">
+        <button class="case-button" data-go="detail"><span class="status">Needs review</span><span><strong>Alex and Sam</strong><p>A normally constructive exchange became personal, then Alex went quiet.</p></span><span class="arrow" aria-hidden="true">→</span></button>
+      </section>
+    </main>
+
+    <main class="screen" data-screen="detail" hidden>
+      <button class="back" data-go="overview">← Back to recovery space</button>
+      <header class="case-head">
+        <div><span class="eyebrow">Case VC-022 · Needs review</span><h1 tabindex="-1">Alex and Sam</h1></div>
+        <div class="identity"><strong>Read-only recovery story</strong><span class="demo">Demo mode · compressed timing</span></div>
+      </header>
+      <div class="case-grid">
+        <aside class="case-summary"><h2>What VibeCheck remembers</h2><dl><div><dt>Observed change</dt><dd>The exchange became personal.</dd></div><div><dt>Shared context</dt><dd>They usually repair disagreements quickly with humor.</dd></div><div><dt>Uncertainty</dt><dd>Intent is unknown; withdrawal may have other causes.</dd></div><div><dt>Suggested next step</dt><dd>Check in privately and acknowledge how the exchange landed.</dd></div></dl></aside>
+        <section class="timeline" aria-label="Recovery case timeline">
+          <article class="event"><time>12:00 · Community message</time><h2>Something changed.</h2><p>Three messages involved both members and contained two distinct escalation indicators.</p><div class="evidence">Observed excerpt: “This stopped being about the idea.”</div></article>
+          <article class="event"><time>12:01 · Remembered context</time><h2>The ordinary relationship matters.</h2><p>Across an earlier session, Alex and Sam disagreed constructively and repaired tension with humor.</p></article>
+          <article class="event"><time>12:03 · Mind inference</time><h2>One recovery case opened.</h2><p>The later exchange departed from that known pattern. Confidence is 82%; intent remains uncertain.</p></article>
+          <article class="event"><time>Waiting · Creator decision</time><h2>The next move stays human.</h2><p>Approve, edit, or dismiss the suggested outreach privately in Telegram.</p></article>
+        </section>
+      </div>
+    </main>
+  </div>
+  <script src="prototype.js"></script>
+</body>
+</html>

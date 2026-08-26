@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title-b desc-b">
+  <title id="title-b">Common Table</title>
+  <desc id="desc-b">Three unequal poster forms gather around one broad orange common table.</desc>
+  <rect width="256" height="256" rx="52" fill="#FFF3E2"/>
+  <g fill="#181514" stroke="#FFF3E2" stroke-width="7">
+    <rect x="35" y="72" width="91" height="61" rx="28" transform="rotate(-8 80.5 102.5)"/>
+    <rect x="139" y="53" width="84" height="63" rx="29" transform="rotate(10 181 84.5)"/>
+    <rect x="109" y="150" width="105" height="64" rx="30" transform="rotate(-4 161.5 182)"/>
+  </g>
+  <path d="M68 101c20-7 45-9 70-7l47 7c15 3 23 14 20 26-3 11-15 18-29 21l-84 9c-18 2-33-5-37-17-5-14 0-29 13-39Z" fill="#F2643C"/>
+</svg>

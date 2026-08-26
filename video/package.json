@@ -1,0 +1,31 @@
+{
+  "name": "video",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "studio": "remotion studio src/Root.tsx",
+    "render": "remotion render src/Root.tsx Main out/demo.mp4",
+    "render:social": "remotion render src/Root.tsx Social out/social.mp4",
+    "render:all": "npm run render && npm run render:social",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.499",
+    "@remotion/google-fonts": "^4.0.499",
+    "@remotion/media": "^4.0.499",
+    "@remotion/transitions": "^4.0.499",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "remotion": "^4.0.499"
+  }
+}

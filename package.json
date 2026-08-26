@@ -1,0 +1,57 @@
+{
+  "name": "vibecheck",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Telegram-first community recovery agent powered by Minds",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server/index.ts",
+    "dev:client": "vite",
+    "build": "vite build",
+    "start": "tsx src/server/index.ts",
+    "preview": "vite preview",
+    "lint": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.server.json --noEmit",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:foundation": "vitest run tests/contract tests/integration/database.test.ts tests/integration/app.test.ts tests/integration/live-probe.test.ts tests/integration/telegram-webhook.test.ts tests/integration/configure-telegram-webhook.test.ts tests/unit/logger-errors.test.ts",
+    "test:recovery-unit": "vitest run tests/unit/case-state.test.ts tests/unit/timing-profile.test.ts tests/unit/conflict-eligibility.test.ts tests/unit/recovery-eligibility.test.ts",
+    "test:recovery-integration": "vitest run tests/integration/reasoning-service.test.ts tests/integration/telegram-webhook-receiver.test.ts tests/integration/observation-worker.test.ts tests/integration/creator-commands.test.ts tests/integration/deadline-scheduler.test.ts tests/integration/telegram-notifier.test.ts tests/integration/runtime-coordinator.test.ts tests/integration/server-runtime.test.ts tests/integration/configure-mind.test.ts",
+    "test:auth": "vitest run tests/unit/telegram-auth.test.ts tests/integration/session-service.test.ts",
+    "test:dashboard": "vitest run tests/contract/dashboard-api.test.ts tests/integration/authorization.test.ts",
+    "test:failure-integrity": "vitest run tests/integration/failure-matrix.test.ts tests/unit/provenance.test.ts tests/unit/dashboard-states.test.ts",
+    "test:restart": "vitest run tests/integration/telegram-webhook-receiver.test.ts tests/integration/observation-worker.test.ts tests/integration/deadline-scheduler.test.ts",
+    "test:e2e": "playwright test",
+    "test:release-gates": "vitest run tests/integration/performance.test.ts && playwright test tests/e2e/accessibility.spec.ts",
+    "probe:live": "node --env-file-if-exists=.env --import tsx scripts/probe-live-integrations.ts",
+    "configure:mind": "node --env-file-if-exists=.env --import tsx scripts/configure-mind.ts",
+    "configure:telegram": "node --env-file-if-exists=.env --import tsx scripts/configure-telegram-webhook.ts",
+    "demo:seed": "tsx scripts/seed-demo.ts",
+    "demo:rehearse": "tsx scripts/rehearse-demo.ts",
+    "verify:live-demo": "node --env-file-if-exists=.env --import tsx scripts/verify-live-demo.ts",
+    "verify": "npm run lint && npm test && npm run build"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@types/node": "^26.2.0",
+    "@vitest/coverage-v8": "^4.1.10",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "playwright": "^1.62.1",
+    "tsx": "^4.23.12",
+    "typescript": "^5.7.0",
+    "vite": "^6.0.0",
+    "vitest": "^4.1.10",
+    "yaml": "^2.9.0"
+  },
+  "dependencies": {
+    "@animocabrands/minds-client-lib": "^0.1.3",
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/static": "^10.1.3",
+    "fastify": "^5.11.3",
+    "playwright-core": "^1.62.0",
+    "zod": "^4.4.3"
+  }
+}

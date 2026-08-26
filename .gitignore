@@ -1,0 +1,43 @@
+# build-prompt scaffolding (local only)
+Goal.md
+prompt.md
+plan.md
+design.md
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+coverage/
+playwright-report/
+test-results/
+
+# Environment variables
+.env
+.env.local
+.env*.local
+
+# Runtime state and live-gate output
+data/
+*.sqlite
+*.sqlite3
+*.db
+*.db-wal
+*.db-shm
+docs/integration-probe.md
+docs/live-demo-evidence.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

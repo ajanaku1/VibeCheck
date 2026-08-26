@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibecheck.local/contracts/minds-analysis.schema.json",
+  "title": "VibeCheck Mind Analysis Envelope",
+  "description": "Versioned inference returned by the live VibeCheck Mind. Every evidence reference is validated against stored observations before use.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "analysisKind",
+    "observationRefs",
+    "context",
+    "escalationIndicators",
+    "recoverySignals",
+    "confidence",
+    "uncertainty",
+    "recommendedAction"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "vibecheck.analysis.v1"
+    },
+    "analysisKind": {
+      "enum": ["baseline", "fracture", "recovery", "draft"]
+    },
+    "observationRefs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      }
+    },
+    "involvedMemberRefs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "default": []
+    },
+    "context": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "statement", "evidenceRefs", "confidence"],
+        "properties": {
+          "kind": {
+            "enum": ["norm", "relationship"]
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          },
+          "evidenceRefs": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    },
+    "escalationIndicators": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "evidenceRefs", "explanation"],
+        "properties": {
+          "type": {
+            "enum": [
+              "direct_personal_criticism",
+              "contempt_or_dismissal",
+              "hostile_contradiction_after_deescalation",
+              "explicit_intent_to_disengage"
+            ]
+          },
+          "evidenceRefs": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "explanation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 500
+          }
+        }
+      }
+    },
+    "recoverySignals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["affectedMemberReturned", "relevantConstructiveInteraction"],
+      "properties": {
+        "affectedMemberReturned": {
+          "$ref": "#/$defs/evidenceDecision"
+        },
+        "relevantConstructiveInteraction": {
+          "$ref": "#/$defs/evidenceDecision"
+        }
+      }
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "uncertainty": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "observedChange": {
+      "type": ["string", "null"],
+      "maxLength": 500
+    },
+    "suggestedOutreach": {
+      "type": ["string", "null"],
+      "maxLength": 2000
+    },
+    "recommendedAction": {
+      "enum": ["retain_context", "observe_only", "open_or_update_case", "request_recovery_confirmation", "no_action"]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "analysisKind": { "const": "fracture" }
+        },
+        "required": ["analysisKind"]
+      },
+      "then": {
+        "required": ["involvedMemberRefs"],
+        "properties": {
+          "involvedMemberRefs": { "type": "array", "minItems": 2 }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "analysisKind": { "const": "recovery" }
+        },
+        "required": ["analysisKind"]
+      },
+      "then": {
+        "required": ["involvedMemberRefs"],
+        "properties": {
+          "involvedMemberRefs": { "type": "array", "minItems": 1 }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "evidenceDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["present", "evidenceRefs", "explanation"],
+      "properties": {
+        "present": {
+          "type": "boolean"
+        },
+        "evidenceRefs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "explanation": {
+          "type": "string",
+          "maxLength": 500
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "present": { "const": true }
+            },
+            "required": ["present"]
+          },
+          "then": {
+            "properties": {
+              "evidenceRefs": { "type": "array", "minItems": 1 }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: vibecheck-recovery
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 22.13.1
+      - key: APP_BASE_URL
+        sync: false
+      - key: DATABASE_PATH
+        value: /opt/render/project/src/data/vibecheck.sqlite
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: VIBECHECK_TIMING_PROFILE
+        value: demo
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: TELEGRAM_BOT_USERNAME
+        sync: false
+      - key: TELEGRAM_COMMUNITY_CHAT_ID
+        sync: false
+      - key: TELEGRAM_WEBHOOK_SECRET
+        generateValue: true
+      - key: AUTHORIZED_TELEGRAM_USER_ID
+        sync: false
+      - key: AUTHORIZED_TELEGRAM_CHAT_ID
+        sync: false
+      - key: MINDS_BUILDER_API_KEY
+        sync: false
+      - key: MINDS_MIND_ID
+        sync: false
+      - key: MINDS_ENGINE_ALIAS
+        value: vibecheck-engine
+      - key: MINDS_REPLY_TIMEOUT_MS
+        value: 180000

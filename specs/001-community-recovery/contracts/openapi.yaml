@@ -1,0 +1,430 @@
+openapi: 3.1.0
+info:
+  title: VibeCheck Recovery Dashboard API
+  version: 1.0.0
+  description: Read-only creator dashboard API plus Telegram authentication/session endpoints.
+servers:
+  - url: /
+paths:
+  /api/health:
+    get:
+      operationId: getHealth
+      security: []
+      responses:
+        '200':
+          description: Process and database are ready. No integration secrets or community data are returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Health'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /api/auth/config:
+    get:
+      operationId: getAuthConfig
+      security: []
+      responses:
+        '200':
+          description: Public values needed to render Telegram sign-in.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: false
+                required: [telegramBotUsername]
+                properties:
+                  telegramBotUsername:
+                    type: string
+                    minLength: 5
+  /api/auth/telegram:
+    post:
+      operationId: authenticateWithTelegram
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TelegramAuthPayload'
+      responses:
+        '200':
+          description: Verified and authorized. Sets the opaque HttpOnly session cookie.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '400':
+          $ref: '#/components/responses/InvalidRequest'
+        '401':
+          description: Signature invalid or payload expired.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '403':
+          description: Telegram identity is valid but is not the configured creator. No protected fields are returned.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /api/auth/session:
+    get:
+      operationId: getSession
+      responses:
+        '200':
+          description: Current authorized creator session.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+  /api/auth/logout:
+    post:
+      operationId: logout
+      responses:
+        '204':
+          description: Session revoked and cookie cleared.
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+  /api/recovery-overview:
+    get:
+      operationId: getRecoveryOverview
+      responses:
+        '200':
+          description: Evidence-limited projection for the configured creator/community.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecoveryOverview'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Unauthorized'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /api/recovery-cases/{caseId}:
+    get:
+      operationId: getRecoveryCase
+      parameters:
+        - name: caseId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Read-only case and ordered provenance-labeled timeline.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecoveryCaseDetail'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Case is absent or does not belong to the configured community.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Problem'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+components:
+  securitySchemes:
+    creatorSession:
+      type: apiKey
+      in: cookie
+      name: vibecheck_session
+  responses:
+    InvalidRequest:
+      description: Request fields are malformed.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Unauthenticated:
+      description: A valid active creator session is required.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    Unauthorized:
+      description: The identity is not authorized for this community; no protected fields are returned.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    ServiceUnavailable:
+      description: Required data or a local dependency is temporarily unavailable; no sample data is substituted.
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    Health:
+      type: object
+      additionalProperties: false
+      required: [status, database]
+      properties:
+        status:
+          type: string
+          enum: [ready, degraded]
+        database:
+          type: string
+          enum: [ready, unavailable]
+    TelegramAuthPayload:
+      type: object
+      additionalProperties: false
+      required: [id, first_name, auth_date, hash]
+      properties:
+        id:
+          type: string
+          pattern: '^[1-9][0-9]*$'
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 128
+        last_name:
+          type: string
+          maxLength: 128
+        username:
+          type: string
+          maxLength: 64
+        photo_url:
+          type: string
+          format: uri
+        auth_date:
+          oneOf:
+            - type: integer
+              minimum: 1
+            - type: string
+              pattern: '^[0-9]+$'
+        hash:
+          type: string
+          pattern: '^[a-fA-F0-9]{64}$'
+    Creator:
+      type: object
+      additionalProperties: false
+      required: [telegramUserId, displayName]
+      properties:
+        telegramUserId:
+          type: string
+        displayName:
+          type: string
+        username:
+          type: [string, 'null']
+        photoUrl:
+          type: [string, 'null']
+          format: uri
+    Session:
+      type: object
+      additionalProperties: false
+      required: [creator, expiresAt]
+      properties:
+        creator:
+          $ref: '#/components/schemas/Creator'
+        expiresAt:
+          type: string
+          format: date-time
+    CaseState:
+      type: string
+      enum: [needs_review, monitoring, recovery_detected, resolved, unresolved, dismissed]
+    ObservationStatus:
+      type: string
+      enum: [learning, observing, delayed, error]
+    TimingProfile:
+      type: string
+      enum: [demo, standard]
+    CaseSummary:
+      type: object
+      additionalProperties: false
+      required: [id, trigger, state, people, observedChange, confidence, uncertainty, awaitingCreatorAction, updatedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        trigger:
+          type: string
+          enum: [escalating_conflict, post_conflict_silence]
+        state:
+          $ref: '#/components/schemas/CaseState'
+        people:
+          type: array
+          minItems: 1
+          items:
+            type: string
+        observedChange:
+          type: string
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        uncertainty:
+          type: string
+        awaitingCreatorAction:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+    RecoveryOverview:
+      type: object
+      additionalProperties: false
+      required: [creator, community, observationStatus, timingProfile, counts, cases, recentOutcomes]
+      properties:
+        creator:
+          $ref: '#/components/schemas/Creator'
+        community:
+          type: object
+          additionalProperties: false
+          required: [displayName]
+          properties:
+            displayName:
+              type: string
+        observationStatus:
+          $ref: '#/components/schemas/ObservationStatus'
+        timingProfile:
+          $ref: '#/components/schemas/TimingProfile'
+        counts:
+          type: object
+          additionalProperties: false
+          required: [open, resolved, unresolved, awaitingAction]
+          properties:
+            open: { type: integer, minimum: 0 }
+            resolved: { type: integer, minimum: 0 }
+            unresolved: { type: integer, minimum: 0 }
+            awaitingAction: { type: integer, minimum: 0 }
+        cases:
+          type: array
+          items:
+            $ref: '#/components/schemas/CaseSummary'
+        recentOutcomes:
+          type: array
+          maxItems: 5
+          items:
+            $ref: '#/components/schemas/CaseSummary'
+    TimelineEvent:
+      type: object
+      additionalProperties: false
+      required: [id, eventType, actor, provenance, summary, evidence, resultingState, occurredAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        eventType:
+          type: string
+        actor:
+          type: string
+          enum: [community_member, mind, creator, system, external_service]
+        provenance:
+          type: string
+          enum: [observation, remembered_context, mind_inference, creator_decision, external_operation]
+        summary:
+          type: string
+        evidence:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [source, excerpt]
+            properties:
+              source:
+                type: string
+              excerpt:
+                type: string
+        resultingState:
+          $ref: '#/components/schemas/CaseState'
+        occurredAt:
+          type: string
+          format: date-time
+    RecoveryCaseDetail:
+      type: object
+      additionalProperties: false
+      required:
+        - id
+        - trigger
+        - state
+        - people
+        - observedChange
+        - confidence
+        - uncertainty
+        - awaitingCreatorAction
+        - updatedAt
+        - rememberedContext
+        - suggestedOutreach
+        - finalOutreach
+        - timeline
+      properties:
+        id:
+          type: string
+          format: uuid
+        trigger:
+          type: string
+          enum: [escalating_conflict, post_conflict_silence]
+        state:
+          $ref: '#/components/schemas/CaseState'
+        people:
+          type: array
+          minItems: 1
+          items:
+            type: string
+        observedChange:
+          type: string
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        uncertainty:
+          type: string
+        awaitingCreatorAction:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+        rememberedContext:
+          type: array
+          items:
+            type: string
+        suggestedOutreach:
+          type: string
+        finalOutreach:
+          type: [string, 'null']
+        timeline:
+          type: array
+          items:
+            $ref: '#/components/schemas/TimelineEvent'
+    Problem:
+      type: object
+      additionalProperties: false
+      required: [type, title, status, code]
+      properties:
+        type:
+          type: string
+          format: uri-reference
+        title:
+          type: string
+        status:
+          type: integer
+          minimum: 400
+          maximum: 599
+        code:
+          type: string
+        detail:
+          type: string
+        retryable:
+          type: boolean
+security:
+  - creatorSession: []
