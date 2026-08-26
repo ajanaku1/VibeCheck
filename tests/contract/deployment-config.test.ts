@@ -20,6 +20,8 @@ describe('production deployment contract', () => {
     const packageManifest = JSON.parse(await readFile('package.json', 'utf8')) as {
       engines?: { node?: string }
       scripts?: Record<string, string>
+      dependencies?: Record<string, string>
+      devDependencies?: Record<string, string>
     }
     const blueprint = parse(await readFile('render.yaml', 'utf8')) as { services: RenderService[] }
     const service = blueprint.services[0]
@@ -31,7 +33,7 @@ describe('production deployment contract', () => {
       name: 'vibecheck-recovery',
       runtime: 'node',
       plan: 'free',
-      buildCommand: 'npm ci && npm run build',
+      buildCommand: 'npm ci --include=dev && npm run build',
       startCommand: 'npm run start',
       healthCheckPath: '/api/health',
     })
@@ -46,6 +48,12 @@ describe('production deployment contract', () => {
       expect(variables.get(secret)).toEqual({ key: secret, sync: false })
     }
     expect(packageManifest.engines?.node).toBe('>=22.13.0')
+    expect(packageManifest.dependencies).toMatchObject({
+      tsx: expect.any(String),
+      vite: expect.any(String),
+    })
+    expect(packageManifest.devDependencies?.tsx).toBeUndefined()
+    expect(packageManifest.devDependencies?.vite).toBeUndefined()
     expect(packageManifest.scripts?.['verify:live-demo']).toBe(
       'node --env-file-if-exists=.env --import tsx scripts/verify-live-demo.ts',
     )
